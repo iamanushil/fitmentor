@@ -121,12 +121,12 @@ workout_plan_jobs(
 
 ## Day-by-day plan
 
-### Day 1 — Foundation
-- [ ] `git init`, repo structure (see SCAFFOLD below)
-- [ ] `docker-compose.yml`: postgres, redis
-- [ ] FastAPI app with `/health`, structlog JSON logging, request-id middleware
-- [ ] Pydantic Settings from `.env`
-- [ ] Pre-commit: ruff, black, mypy
+### Day 1 — Foundation ✅
+- [x] `git init`, repo structure (see SCAFFOLD below)
+- [x] `docker-compose.yml`: postgres, redis
+- [x] FastAPI app with `/health`, structlog JSON logging, request-id middleware
+- [x] Pydantic Settings from `.env`
+- [x] Pre-commit: ruff, black, mypy
 
 ### Day 2 — Auth + DB
 - [ ] Alembic init + first migration (users, fitness_profiles)
