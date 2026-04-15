@@ -37,7 +37,7 @@ htmlcov/
 Thumbs.db
 
 # Alembic (keep versions, ignore local)
-backend/alembic.ini
+# backend/alembic.ini  # tracked — contains migration config
 
 # Node (for frontend days 11+)
 node_modules/

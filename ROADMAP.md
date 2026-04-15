@@ -1,4 +1,4 @@
-# FitMentor — 2-Week Build Roadmap
+# FitMentor — Roadmap
 
 An AI Fitness Coach backend + frontend, architected like a production system.
 
@@ -57,6 +57,10 @@ FitMentor is an async, LLM-powered fitness coaching platform. Users create a fit
                                                                  │  • update DB    │
                                                                  └─────────────────┘
 ```
+
+---
+
+> Flow diagrams, sequence diagrams, and user journey: see **[ARCHITECTURE.md](ARCHITECTURE.md)**
 
 ---
 
@@ -119,35 +123,35 @@ workout_plan_jobs(
 
 ---
 
-## Day-by-day plan
+## Phase-by-phase plan
 
-### Day 1 — Foundation ✅
+### Phase 1 — Foundation ✅
 - [x] `git init`, repo structure (see SCAFFOLD below)
 - [x] `docker-compose.yml`: postgres, redis
 - [x] FastAPI app with `/health`, structlog JSON logging, request-id middleware
 - [x] Pydantic Settings from `.env`
 - [x] Pre-commit: ruff, black, mypy
 
-### Day 2 — Auth + DB
-- [ ] Alembic init + first migration (users, fitness_profiles)
-- [ ] Async SQLAlchemy session factory
-- [ ] Clerk JWT verification middleware (fetch JWKS, cache in Redis 24h)
-- [ ] Dependency: `get_current_user()` → pulls/creates user row from Clerk sub
+### Phase 2 — Auth + DB ✅
+- [x] Alembic init + first migration (users, fitness_profiles)
+- [x] Async SQLAlchemy session factory
+- [x] Clerk JWT verification middleware (fetch JWKS, cache in Redis 24h)
+- [x] Dependency: `get_current_user()` → pulls/creates user row from Clerk sub
 
-### Day 3 — Profile service
+### Phase 3 — Profile service
 - [ ] `POST /api/v1/profile` — upsert
 - [ ] `GET /api/v1/profile/me`
 - [ ] Redis cache layer (24h TTL, invalidated on update)
 - [ ] Repository + service layer separation
 - [ ] Unit tests for profile service (pytest + pytest-asyncio)
 
-### Day 4 — Portkey + LLM wrapper
+### Phase 4 — Portkey + LLM wrapper
 - [ ] Sign up for Portkey free tier, create virtual key for OpenAI
 - [ ] `services/llm.py`: wraps Portkey client, retry/backoff via tenacity
 - [ ] Cost tracker: maps model → $/1M tokens, computes per-call cost
 - [ ] System prompt template with profile injection
 
-### Day 5–6 — Chat service
+### Phase 5–6 — Chat service
 - [ ] Migration: conversations, messages
 - [ ] `POST /api/v1/conversations` → create + first message
 - [ ] `POST /api/v1/conversations/{id}/messages` → append
@@ -156,44 +160,44 @@ workout_plan_jobs(
 - [ ] `GET /api/v1/conversations/{id}` → full history
 - [ ] APScheduler cleanup job: mark conversations expired after 2h inactive
 
-### Day 7 — Streaming + polish
+### Phase 7 — Streaming + polish
 - [ ] SSE endpoint: `GET /api/v1/conversations/{id}/stream`
 - [ ] Rate limiter (slowapi or custom Redis token bucket)
 - [ ] OpenAPI docs cleanup, examples
 - [ ] Integration tests hitting real Postgres (use testcontainers)
 
-### Day 8 — SQS + S3 setup
+### Phase 8 — SQS + S3 setup
 - [ ] Terraform or AWS CLI: create SQS FIFO queue, S3 bucket, IAM roles
 - [ ] `services/sqs.py`: aioboto3 wrapper (send, receive, delete)
 - [ ] `services/storage.py`: S3 upload + presigned URL
 - [ ] Migration: `workout_plan_jobs`
 
-### Day 9 — Worker process
+### Phase 9 — Worker process
 - [ ] Separate entrypoint: `python -m fitmentor.worker`
 - [ ] SQS long-poll loop with graceful shutdown (SIGTERM)
 - [ ] Job handler: fetch profile → LLM structured output → PDF render → S3 upload → DB update
 - [ ] Use OpenAI JSON mode with a Pydantic schema for the plan structure
 - [ ] Retry logic: on failure, increment attempt count, dead-letter queue after 3
 
-### Day 10 — PDF generation
+### Phase 10 — PDF generation
 - [ ] Plan schema: `WeeklyPlan(days: [DayPlan(exercises: [Exercise])])`
 - [ ] Jinja2 HTML template → WeasyPrint PDF (branded, clean)
 - [ ] `POST /api/v1/workout-plan/generate` → enqueue + return job_id
 - [ ] `GET /api/v1/workout-plan/{job_id}` → status + presigned URL when ready
 
-### Day 11 — Frontend scaffold
+### Phase 11 — Frontend scaffold
 - [ ] `npx create-next-app@latest fitmentor-web --ts --tailwind --app`
 - [ ] Clerk setup (middleware, sign-in page)
 - [ ] API client with auth token injection
 - [ ] Profile setup wizard (multi-step form, react-hook-form + zod)
 
-### Day 12 — Frontend chat
+### Phase 12 — Frontend chat
 - [ ] Chat page with message list + composer
 - [ ] SSE streaming of assistant responses
 - [ ] "Generate weekly plan" CTA → polls job status → downloads PDF
 - [ ] Past plans list
 
-### Day 13 — Containerize + deploy
+### Phase 13 — Containerize + deploy
 - [ ] Dockerfile (multi-stage, ~150MB image)
 - [ ] ECS task definitions: api, worker (separate services)
 - [ ] RDS Postgres (db.t4g.micro), ElastiCache Redis
@@ -201,7 +205,7 @@ workout_plan_jobs(
 - [ ] Application Load Balancer + HTTPS via ACM
 - [ ] Vercel for Next.js
 
-### Day 14 — CI/CD, docs, demo
+### Phase 14 — CI/CD, docs, demo
 - [ ] GitHub Actions: test → build → push ECR → update ECS service
 - [ ] README with architecture diagram (draw.io or excalidraw)
 - [ ] Loom demo video (3–5 min)
@@ -213,28 +217,18 @@ workout_plan_jobs(
 
 | Skill | Where you learn it |
 |---|---|
-| Async Python, FastAPI | Days 1–7 |
-| SQLAlchemy 2.0 async + Alembic | Days 2, 5 |
-| LLM integration patterns (gateway, retries, cost tracking) | Day 4 |
-| Multi-turn conversation memory (Responses API) | Day 6 |
-| SSE streaming | Day 7 |
-| AWS SQS / claim-check pattern | Days 8–9 |
-| PDF generation | Day 10 |
-| JWT RS256 + JWKS validation | Day 2 |
-| Dockerizing Python services | Day 13 |
-| AWS ECS Fargate deployment | Day 13 |
-| GitHub Actions CI/CD | Day 14 |
-| Next.js 14 App Router + Clerk auth | Days 11–12 |
-
----
-
-## Resume bullet examples
-
-- Designed and shipped FitMentor, a production-grade AI fitness coach serving personalized chat and generating branded PDF workout plans on demand.
-- Built an async FastAPI backend with PostgreSQL, Redis, and AWS SQS; achieved p95 chat latency of <2s using Portkey gateway caching and OpenAI Responses API threading.
-- Implemented claim-check pattern (SQS + S3) to decouple long-running PDF generation from the request path, supporting retry, dead-letter, and idempotent workers.
-- Deployed on AWS ECS Fargate with RDS, ElastiCache, ALB, and Secrets Manager, orchestrated via GitHub Actions CI/CD.
-- Frontend in Next.js 14 with Clerk JWT auth; streamed assistant responses via SSE.
+| Async Python, FastAPI | Phases 1–7 |
+| SQLAlchemy 2.0 async + Alembic | Phases 2, 5 |
+| LLM integration patterns (gateway, retries, cost tracking) | Phase 4 |
+| Multi-turn conversation memory (Responses API) | Phase 6 |
+| SSE streaming | Phase 7 |
+| AWS SQS / claim-check pattern | Phases 8–9 |
+| PDF generation | Phase 10 |
+| JWT RS256 + JWKS validation | Phase 2 |
+| Dockerizing Python services | Phase 13 |
+| AWS ECS Fargate deployment | Phase 13 |
+| GitHub Actions CI/CD | Phase 14 |
+| Next.js 14 App Router + Clerk auth | Phases 11–12 |
 
 ---
 
@@ -280,7 +274,7 @@ fitmentor/
 │       ├── cache/redis_client.py
 │       └── workers/
 │           └── workout_plan_worker.py
-├── frontend/                    # Next.js 14 app (Day 11)
+├── frontend/                    # Next.js 14 app (Phase 11)
 └── infra/
     └── terraform/               # optional but nice
 ```
@@ -304,9 +298,9 @@ uvicorn fitmentor.main:app --reload
 
 ---
 
-## Reference patterns to steal from the Digii codebase
+## Reference patterns to steal from the codebase
 
-Open the Digii repo alongside yours. Specifically study:
+Open the repo alongside yours. Specifically study:
 
 - `src/student_mentor/main.py` — app factory, lifespan
 - `src/student_mentor/auth/` — JWT RS256 + JWKS caching
@@ -322,10 +316,10 @@ Read them to understand the *shape*; don't copy-paste. Retyping teaches you more
 
 ## Success criteria
 
-By end of Day 14 you should be able to demo:
+By end of Phase 14 you should be able to demo:
 1. Sign up on the web app, fill out profile
 2. Chat with the AI coach and get profile-aware responses
 3. Click "generate weekly plan," wait ~30s, download a branded PDF
 4. Show the deployed URLs + GitHub repo + architecture diagram
 
-That's a portfolio-grade project that tells a clear story in interviews.
+

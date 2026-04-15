@@ -1,6 +1,6 @@
 # FitMentor Backend
 
-See the top-level [ROADMAP.md](../ROADMAP.md) for the full 2-week build plan.
+See the top-level [ROADMAP.md](../ROADMAP.md).
 
 ## Quick start (Day 1)
 
